@@ -1,7 +1,7 @@
 
 openapi: 3.0.2
 info:
-  version: 3.27.0
+  version: 0.0.0
   title: Perun RPC API
   description: Perun Remote Procedure Calls Application Programming Interface
   contact:
@@ -98,6 +98,7 @@ components:
             titleAfter: { type: string }
             serviceUser: { type: boolean }
             sponsoredUser: { type: boolean }
+            uuid: { type: string, format: uuid }
             specificUser: { type: boolean }
             majorSpecificType: { type: string }
       discriminator:
@@ -359,6 +360,7 @@ components:
         enrichedResource: { $ref: '#/components/schemas/EnrichedResource' }
         status: { $ref: '#/components/schemas/GroupResourceStatus' }
         facility: { $ref: '#/components/schemas/Facility'}
+        resourceTags: { type: array, items: { $ref: '#/components/schemas/ResourceTag' } }
 
     AssignedGroup:
       type: object
@@ -567,6 +569,7 @@ components:
             description: { type: string }
             voId: { type: integer }
             parentGroupId: { type: integer }
+            uuid: { type: string, format: uuid }
       discriminator:
         propertyName: beanName
 
@@ -586,6 +589,7 @@ components:
             description: { type: string }
             voId: { type: integer }
             facilityId: { type: integer }
+            uuid: { type: string, format: uuid }
       discriminator:
         propertyName: beanName
 
@@ -8079,22 +8083,6 @@ paths:
     post:
       tags:
         - UsersManager
-      operationId: validatePreferredEmailChange
-      summary: Validate new preferred email address. Request to validate is determined based on encrypted parameters sent in email notice by requestPreferredEmailChange() method.
-      parameters:
-        - { name: i, description: "encrypted request parameter", schema: { type: string }, in: query, required: true }
-        - { name: m, description: "encrypted request parameter", schema: { type: string }, in: query, required: true }
-        - { name: u, description: "id of user you want to validate preferred email request", schema: { type: integer }, in: query, required: true }
-      responses:
-        '200':
-          $ref: '#/components/responses/StringResponse'
-        default:
-          $ref: '#/components/responses/ExceptionResponse'
-
-  /urlinjsonout/usersManager/validatePreferredEmailChange/token:
-    post:
-      tags:
-        - UsersManager
       operationId: validatePreferredEmailChangeWithToken
       summary: Validate new preferred email address. Request to validate is determined based on token parameter sent in email notice by requestPreferredEmailChange() method.
       parameters:
@@ -8454,6 +8442,21 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/VoidResponse'
+        default:
+          $ref: '#/components/responses/ExceptionResponse'
+
+  /urlinjsonout/usersManager/isLoginAvailable:
+    post:
+      tags:
+        - UsersManager
+      operationId: isLoginAvailable
+      summary: Checks if the login is available in the namespace. Return 1 if yes, 0 if no.
+      parameters:
+        - { name: loginNamespace, schema: { type: string }, in: query, required: true }
+        - $ref: '#/components/parameters/login'
+      responses:
+        '200':
+          $ref: '#/components/responses/IntegerResponse'
         default:
           $ref: '#/components/responses/ExceptionResponse'
 
@@ -11583,6 +11586,22 @@ paths:
         default:
           $ref: '#/components/responses/ExceptionResponse'
 
+  /json/groupsManager/getGroupRichMembersByIds:
+    get:
+      tags:
+        - GroupsManager
+      operationId: getGroupRichMembersByIds
+      summary: Returns list of RichMembers with requested attributes by their member IDs from given group. Skips invalid member IDs (unknown or not members of group). Supports member, member-group (stored in memberAttributes) and user attributes (stored in userAttributes).
+      parameters:
+        - $ref: '#/components/parameters/groupId'
+        - $ref: '#/components/parameters/memberIds'
+        - $ref: '#/components/parameters/attrNames'
+      responses:
+        '200':
+          $ref: '#/components/responses/ListOfRichMembersResponse'
+        default:
+          $ref: '#/components/responses/ExceptionResponse'
+
   #################################################
   #                                               #
   # ResourceManager                               #
@@ -11823,10 +11842,11 @@ paths:
       tags:
         - ResourcesManager
       operationId: assignGroupToResource
-      summary: Assigns a group to a resource. Check if attributes for each member from group are valid. Fill members' attributes with missing value.
+      summary: Assigns a group to a resource. Check if attributes for each member from group are valid. Fill members' attributes with missing value. Work in sync/async mode.
       parameters:
         - $ref: '#/components/parameters/groupId'
         - $ref: '#/components/parameters/resourceId'
+        - $ref: '#/components/parameters/async'
       responses:
         '200':
           $ref: '#/components/responses/VoidResponse'
@@ -11838,10 +11858,11 @@ paths:
       tags:
         - ResourcesManager
       operationId: assignGroupsToResource
-      summary: Assigns groups to a resource. Check if attributes for each member from groups are valid. Fill members' attributes with missing values.
+      summary: Assigns groups to a resource. Check if attributes for each member from groups are valid. Fill members' attributes with missing values. Work in sync/async mode.
       parameters:
         - $ref: '#/components/parameters/groupIds'
         - $ref: '#/components/parameters/resourceId'
+        - $ref: '#/components/parameters/async'
       responses:
         '200':
           $ref: '#/components/responses/VoidResponse'
@@ -11853,10 +11874,11 @@ paths:
       tags:
         - ResourcesManager
       operationId: assignGroupToResources
-      summary: Assigns a group to resources. Check if attributes for each member from group are valid. Fill members' attributes with missing values.
+      summary: Assigns a group to resources. Check if attributes for each member from group are valid. Fill members' attributes with missing values. Work in sync/async mode.
       parameters:
         - $ref: '#/components/parameters/groupId'
         - $ref: '#/components/parameters/resourceIds'
+        - $ref: '#/components/parameters/async'
       responses:
         '200':
           $ref: '#/components/responses/VoidResponse'
@@ -11942,7 +11964,7 @@ paths:
       tags:
         - ResourcesManager
       operationId: getResourceAssignments
-      summary: Lists all of the resource assignments for the given group. Also, returns specified attributes for the resources.
+      summary: Lists all of the resource assignments for the given group. Also, returns specified attributes for the resources and resource tags.
       parameters:
         - $ref: '#/components/parameters/groupId'
         - $ref: '#/components/parameters/attrNamesOptional'

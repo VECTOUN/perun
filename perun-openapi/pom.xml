@@ -7,7 +7,7 @@
 	<parent>
 		<artifactId>perun</artifactId>
 		<groupId>cz.metacentrum</groupId>
-		<version>3.27.0</version>
+		<version>0.0.0-development</version>
 	</parent>
 
 	<groupId>cz.metacentrum.perun</groupId>
@@ -28,7 +28,7 @@
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
-				<version>5.1.0</version>
+				<version>5.2.0</version>
 				<executions>
 					<execution>
 						<goals>

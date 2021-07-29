@@ -848,7 +848,7 @@ public class UsersManagerImpl implements UsersManagerImplApi {
 	}
 
 	/**
-	 * Returns list of users who matches the searchString, searching name, id, member attributes, user attributes
+	 * Returns list of users who matches the searchString, searching name, id, uuid, member attributes, user attributes
 	 * and userExtSource attributes (listed in CoreConfig).
 	 *
 	 * @param searchString string used to search by
@@ -856,54 +856,24 @@ public class UsersManagerImpl implements UsersManagerImplApi {
 	 * @return list of users
 	 */
 	private List<User> findUsers(String searchString, boolean exactMatch) {
-		String userNameQueryString;
-		if (exactMatch) {
-			// Part of query to search by user name (exact)
-			userNameQueryString = Utils.prepareUserSearchQueryExactMatch();
-		} else {
-			// Part of query to search by user name (not exact)
-			userNameQueryString = Utils.prepareUserSearchQuerySimilarMatch();
-		}
-
-		// Part of query to search by user id
-		String idQueryString = "";
-		try {
-			int id = Integer.parseInt(searchString);
-			idQueryString = " users.id=" + id + " or ";
-		} catch (NumberFormatException e) {
-			// IGNORE wrong format of ID
-		}
-
-		// Divide attributes received from CoreConfig into member, user and userExtSource attributes
 		Map<String, List<String>> attributesToSearchBy = Utils.getDividedAttributes();
-
-		// Parts of query to search by attributes
-		Map<String, Pair<String, String>> attributesToSearchByQueries = Utils.getAttributesQuery(attributesToSearchBy.get("memberAttributes"), attributesToSearchBy.get("userAttributes"), attributesToSearchBy.get("uesAttributes"));
-
 		MapSqlParameterSource namedParams = Utils.getMapSqlParameterSourceToSearchUsersOrMembers(searchString, attributesToSearchBy);
+
+		String searchQuery = Utils.prepareSqlWhereForUserMemberSearch(searchString, namedParams, exactMatch);
 
 		// Search by member attributes
 		// Search by user attributes
 		// Search by login in userExtSources
 		// Search by userExtSource attributes
 		// Search by user id
+		// Search by user uuid
 		// Search by name for user
 		Set<User> users = new HashSet<>(namedParameterJdbcTemplate.query("select distinct " + userMappingSelectQuery +
 			" from users " +
 			" left join members on users.id=members.user_id " +
-			" left join user_ext_sources ues on ues.user_id=users.id " +
-			attributesToSearchByQueries.get("memberAttributesQuery").getLeft() +
-			attributesToSearchByQueries.get("userAttributesQuery").getLeft() +
-			attributesToSearchByQueries.get("uesAttributesQuery").getLeft() +
 			" where " +
-			" ( " +
-			" lower(ues.login_ext)=lower(:searchString) or " +
-			attributesToSearchByQueries.get("memberAttributesQuery").getRight() +
-			attributesToSearchByQueries.get("userAttributesQuery").getRight() +
-			attributesToSearchByQueries.get("uesAttributesQuery").getRight() +
-			idQueryString +
-			userNameQueryString +
-			" ) ", namedParams, USER_MAPPER));
+			searchQuery,
+			namedParams, USER_MAPPER));
 
 		log.debug("Searching for users using searchString '{}'", searchString);
 
@@ -1212,25 +1182,6 @@ public class UsersManagerImpl implements UsersManagerImplApi {
 		} catch (RuntimeException e) {
 			throw new InternalErrorException(e);
 		}
-	}
-
-	@Override
-	public String getPreferredEmailChangeRequest(PerunSession sess, User user, String i, String m) {
-
-		int changeId = Integer.parseInt(i, Character.MAX_RADIX);
-
-		int validWindow = BeansUtils.getCoreConfig().getMailchangeValidationWindow();
-
-		// get new email if possible
-		String newEmail;
-		try {
-			newEmail = jdbc.queryForObject("select value from mailchange where id=? and user_id=? and (created_at > (now() - interval '"+validWindow+" hours'))", String.class, changeId, user.getId());
-		} catch (EmptyResultDataAccessException ex) {
-			throw new InternalErrorException("Preferred mail change request with ID="+changeId+" doesn't exists or isn't valid anymore.");
-		}
-
-		return newEmail;
-
 	}
 
 	@Override

@@ -633,7 +633,7 @@ public interface UsersManager {
 	List<RichResource> getAssignedRichResources(PerunSession sess, User user) throws UserNotExistsException, PrivilegeException;
 
 	/**
-	 * Returns list of users who matches the searchString, searching name, email, logins.
+	 * Returns list of users who matches the searchString, searching name, id, uuid, email, logins.
 	 *
 	 * @param sess
 	 * @param searchString
@@ -643,7 +643,7 @@ public interface UsersManager {
 	List<User> findUsers(PerunSession sess, String searchString) throws PrivilegeException;
 
 	/**
-	 * Returns list of RichUsers with attributes who matches the searchString, searching name, email, logins.
+	 * Returns list of RichUsers with attributes who matches the searchString, searching name, id, uuid, email, logins.
 	 *
 	 * @param sess
 	 * @param searchString
@@ -1033,7 +1033,7 @@ public interface UsersManager {
 		throws PrivilegeException, UserNotExistsException;
 
 	/**
-	 * Returns list of RichUsers with attributes who matches the searchString, searching name, email, logins.
+	 * Returns list of RichUsers with attributes who matches the searchString, searching name, id, uuid, email, logins.
 	 *
 	 * @param sess
 	 * @param searchString
@@ -1047,7 +1047,7 @@ public interface UsersManager {
 		throws UserNotExistsException, PrivilegeException;
 
 	/**
-	 * Returns list of RichUsers with attributes who matches the searchString, searching name, email, logins.
+	 * Returns list of RichUsers with attributes who matches the searchString, searching name, id, uuid, email, logins.
 	 * Name part is searched for exact match.
 	 *
 	 * @param sess
@@ -1125,29 +1125,6 @@ public interface UsersManager {
 	 * @throws UserNotExistsException
 	 */
 	void requestPreferredEmailChange(PerunSession sess, String url, User user, String email, String lang, String path, String idp) throws PrivilegeException, UserNotExistsException;
-
-	/**
-	 * Validate change of user's preferred email address.
-	 * New email address is set as value of
-	 * urn:perun:user:attribute-def:def:preferredMail attribute.
-	 *
-	 * @param sess PerunSession
-	 * @param user User to validate email address for
-	 * @param i decrypted parameter
-	 * @param m encrypted parameter
-	 *
-	 * @throws InternalErrorException
-	 * @throws PrivilegeException
-	 * @throws UserNotExistsException
-	 * @throws WrongAttributeAssignmentException
-	 * @throws AttributeNotExistsException
-	 * @throws WrongReferenceAttributeValueException
-	 * @throws WrongAttributeValueException
-	 *
-	 * @return String return new preferred email
-	 */
-	@Deprecated
-	String validatePreferredEmailChange(PerunSession sess, User user, String i, String m) throws PrivilegeException, UserNotExistsException, WrongAttributeAssignmentException, AttributeNotExistsException, WrongReferenceAttributeValueException, WrongAttributeValueException;
 
 	/**
 	 * Validate change of user's preferred email address.

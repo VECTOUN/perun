@@ -786,7 +786,7 @@ public interface UsersManagerBl {
 	List<User> getUsersByAttributeValue(PerunSession sess, String attributeName, String attributeValue);
 
 	/**
-	 * Returns list of users' who matches the searchString, searching name, email and logins.
+	 * Returns list of users' who matches the searchString, searching name, id, uuid, email and logins.
 	 *
 	 * @param sess
 	 * @param searchString
@@ -796,7 +796,7 @@ public interface UsersManagerBl {
 	List<User> findUsers(PerunSession sess, String searchString);
 
 	/**
-	 * Returns list of richusers with attributes who matches the searchString, searching name, email, logins.
+	 * Returns list of richusers with attributes who matches the searchString, searching name, id, uuid, email, logins.
 	 *
 	 * @param sess
 	 * @param searchString
@@ -807,7 +807,7 @@ public interface UsersManagerBl {
 	List<RichUser> findRichUsers(PerunSession sess, String searchString) throws UserNotExistsException;
 
 	/**
-	 * Returns list of richusers with attributes who matches the searchString, searching name, email, logins.
+	 * Returns list of richusers with attributes who matches the searchString, searching name, id, uuid, email, logins.
 	 * Name part is searched for exact match.
 	 *
 	 * @param sess
@@ -1241,7 +1241,7 @@ public interface UsersManagerBl {
 	List<RichUser> getRichUsersWithoutVoWithAttributes(PerunSession sess, List<String> attrsName) throws UserNotExistsException;
 
 	/**
-	 * Returns list of RichUsers with selected attributes who matches the searchString, searching name, email, logins.
+	 * Returns list of RichUsers with selected attributes who matches the searchString, searching name, id, uuid, email, logins.
 	 *
 	 * @param sess
 	 * @param searchString
@@ -1253,7 +1253,7 @@ public interface UsersManagerBl {
 	List<RichUser> findRichUsersWithAttributes(PerunSession sess, String searchString, List<String> attrNames) throws UserNotExistsException;
 
 	/**
-	 * Returns list of RichUsers with selected attributes who matches the searchString, searching name, email, logins.
+	 * Returns list of RichUsers with selected attributes who matches the searchString, searching name, id, uuid, email, logins.
 	 * Name part is searched for exact match.
 	 *
 	 * @param sess
@@ -1304,24 +1304,6 @@ public interface UsersManagerBl {
 	 * @throws InternalErrorException
 	 */
 	void requestPreferredEmailChange(PerunSession sess, String url, User user, String email, String lang, String path, String idp);
-
-	/**
-	 * * Validate change of user's preferred email address.
-	 * New email address is set as value of
-	 * urn:perun:user:attribute-def:def:preferredEmail attribute.
-	 *
-	 * @param sess PerunSession
-	 * @param user User to validate email address for
-	 * @param i    decrypted parameter
-	 * @param m    encrypted parameter
-	 * @return String return new preferred email
-	 * @throws InternalErrorException
-	 * @throws WrongAttributeValueException          If new email address is in wrong format
-	 * @throws WrongAttributeAssignmentException
-	 * @throws AttributeNotExistsException           If user:preferredEmail attribute doesn't exists.
-	 * @throws WrongReferenceAttributeValueException
-	 */
-	String validatePreferredEmailChange(PerunSession sess, User user, String i, String m) throws WrongAttributeValueException, WrongAttributeAssignmentException, AttributeNotExistsException, WrongReferenceAttributeValueException;
 
 	/**
 	 * Validate change of user's preferred email address.

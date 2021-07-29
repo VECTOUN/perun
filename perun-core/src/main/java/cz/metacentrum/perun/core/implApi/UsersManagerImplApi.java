@@ -530,7 +530,7 @@ public interface UsersManagerImplApi {
 	List<Vo> getVosWhereUserIsMember(PerunSession sess, User user);
 
 	/**
-	 * Returns list of users who matches the searchString, searching name, id, member attributes, user attributes
+	 * Returns list of users who matches the searchString, searching name, id, uuid, member attributes, user attributes
 	 * and userExtSource attributes (listed in perun.properties).
 	 *
 	 * @param sess perun session
@@ -540,7 +540,7 @@ public interface UsersManagerImplApi {
 	List<User> findUsers(PerunSession sess, String searchString);
 
 	/**
-	 * Returns list of users who matches the searchString, searching name (exact match), id, member attributes, user attributes
+	 * Returns list of users who matches the searchString, searching name (exact match), id, uuid, member attributes, user attributes
 	 * and userExtSource attributes (listed in perun.properties).
 	 *
 	 * @param sess perun session
@@ -683,18 +683,6 @@ public interface UsersManagerImplApi {
 	 * @return UUID of change request
 	 */
 	UUID requestPreferredEmailChange(PerunSession sess, User user, String email);
-
-	/**
-	 * Get new preferred email value from user's original request
-	 *
-	 * @param sess PerunSession
-	 * @param user User to get new email address for
-	 * @param i decrypted parameter
-	 * @param m encrypted parameter
-	 * @throws InternalErrorException
-	 * @return String return new preferred email
-	 */
-	String getPreferredEmailChangeRequest(PerunSession sess, User user, String i, String m);
 
 	/**
 	 * Get new preferred email value from user's original request

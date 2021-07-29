@@ -7,6 +7,8 @@ import cz.metacentrum.perun.core.api.BanOnResource;
 import cz.metacentrum.perun.core.api.EnrichedResource;
 import cz.metacentrum.perun.core.api.Facility;
 import cz.metacentrum.perun.core.api.Group;
+import cz.metacentrum.perun.core.api.GroupResourceAssignment;
+import cz.metacentrum.perun.core.api.GroupResourceStatus;
 import cz.metacentrum.perun.core.api.Member;
 import cz.metacentrum.perun.core.api.PerunSession;
 import cz.metacentrum.perun.core.api.Resource;
@@ -24,11 +26,9 @@ import cz.metacentrum.perun.core.api.exceptions.BanNotExistsException;
 import cz.metacentrum.perun.core.api.exceptions.GroupAlreadyRemovedFromResourceException;
 import cz.metacentrum.perun.core.api.exceptions.GroupNotAdminException;
 import cz.metacentrum.perun.core.api.exceptions.GroupNotDefinedOnResourceException;
-import cz.metacentrum.perun.core.api.exceptions.GroupNotExistsException;
 import cz.metacentrum.perun.core.api.exceptions.GroupResourceMismatchException;
 import cz.metacentrum.perun.core.api.exceptions.GroupResourceStatusException;
 import cz.metacentrum.perun.core.api.exceptions.InternalErrorException;
-import cz.metacentrum.perun.core.api.exceptions.PrivilegeException;
 import cz.metacentrum.perun.core.api.exceptions.ResourceAlreadyRemovedException;
 import cz.metacentrum.perun.core.api.exceptions.ResourceExistsException;
 import cz.metacentrum.perun.core.api.exceptions.ResourceNotExistsException;
@@ -298,12 +298,13 @@ public interface ResourcesManagerBl {
 	 * @param group
 	 * @param resource
 
+	 * @param async
 	 * @throws InternalErrorException
 	 * @throws WrongAttributeValueException
 	 * @throws WrongReferenceAttributeValueException
 	 * @throws GroupResourceMismatchException
 	 */
-	void assignGroupToResource(PerunSession perunSession, Group group, Resource resource) throws WrongAttributeValueException, WrongReferenceAttributeValueException, GroupResourceMismatchException;
+	void assignGroupToResource(PerunSession perunSession, Group group, Resource resource, boolean async) throws WrongAttributeValueException, WrongReferenceAttributeValueException, GroupResourceMismatchException;
 
 	/**
 	 * Assign groups to a resource. Check if attributes for each member from all groups are valid.
@@ -315,12 +316,13 @@ public interface ResourcesManagerBl {
 	 * @param groups groups to assign
 	 * @param resource
 	 *
+	 * @param async
 	 * @throws InternalErrorException
 	 * @throws WrongAttributeValueException
 	 * @throws WrongReferenceAttributeValueException
 	 * @throws GroupResourceMismatchException
 	 */
-	void assignGroupsToResource(PerunSession perunSession, Iterable<Group> groups, Resource resource) throws WrongAttributeValueException, WrongReferenceAttributeValueException, GroupResourceMismatchException;
+	void assignGroupsToResource(PerunSession perunSession, Iterable<Group> groups, Resource resource, boolean async) throws WrongAttributeValueException, WrongReferenceAttributeValueException, GroupResourceMismatchException;
 
 	/**
 	 * Assign group to the resources. Check if attributes for each member from group are valid.
@@ -332,12 +334,13 @@ public interface ResourcesManagerBl {
 	 * @param group the group
 	 * @param resources list of resources
 	 *
+	 * @param async
 	 * @throws InternalErrorException
 	 * @throws WrongAttributeValueException
 	 * @throws WrongReferenceAttributeValueException
 	 * @throws GroupResourceMismatchException
 	 */
-	void assignGroupToResources(PerunSession perunSession, Group group, List<Resource> resources) throws WrongAttributeValueException, WrongReferenceAttributeValueException, GroupResourceMismatchException;
+	void assignGroupToResources(PerunSession perunSession, Group group, List<Resource> resources, boolean async) throws WrongAttributeValueException, WrongReferenceAttributeValueException, GroupResourceMismatchException;
 
 	/**
 	 * Remove group from a resource.
@@ -1167,13 +1170,13 @@ public interface ResourcesManagerBl {
 	List<EnrichedResource> getEnrichedRichResourcesForFacility(PerunSession sess, Facility facility, List<String> attrNames);
 
 	/**
-	 * Lists all of the resource assignments for the given group. Also, returns specified attributes
+	 * Lists all of the resource assignments for the given group. Also, returns specified attributes and resource tags
 	 * for the resources. If attrNames are null or empty, all resource attributes are returned.
 	 *
 	 * @param sess session
 	 * @param group group
 	 * @param attrNames names of attributes to return
-	 * @return list of assigned resources for given group with specified attributes
+	 * @return list of assigned resources for given group with specified attributes and resource tags
 	 */
 	List<AssignedResource> getResourceAssignments(PerunSession sess, Group group, List<String> attrNames);
 
@@ -1187,6 +1190,16 @@ public interface ResourcesManagerBl {
 	 * @return list of assigned groups for given resource with specified attributes
 	 */
 	List<AssignedGroup> getGroupAssignments(PerunSession sess, Resource resource, List<String> attrNames);
+
+	/**
+	 * Lists all group-resource assignments with given statuses. If statuses are empty or null, lists assignments
+	 * with all statuses.
+	 *
+	 * @param sess session
+	 * @param statuses list of allowed statuses
+	 * @return list of group-resource assignments with given statuses
+	 */
+	List<GroupResourceAssignment> getGroupResourceAssignments(PerunSession sess, List<GroupResourceStatus> statuses);
 
 	/**
 	 * Try to activate the group-resource status. If the async is set to false, the validation is performed
