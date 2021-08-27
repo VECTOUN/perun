@@ -1313,6 +1313,7 @@ public class MembersManagerEntry implements MembersManager {
 			}
 		}
 
+
 		return membersManagerBl
 				.createSponsoredMembersFromCSV(sess, vo, namespace, data, header, sponsor, validityTo, sendActivationLink, url, Validation.ASYNC, groups);
 	}
